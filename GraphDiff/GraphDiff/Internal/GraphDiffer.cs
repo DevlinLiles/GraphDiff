@@ -13,7 +13,7 @@ namespace RefactorThis.GraphDiff.Internal
     /// GraphDiff main access point.
     /// </summary>
     /// <typeparam name="T">The root agreggate type</typeparam>
-    internal class GraphDiffer<T> where T : class, new()
+    internal class GraphDiffer<T> where T : class
     {
         private readonly GraphNode _root;
 
@@ -62,11 +62,22 @@ namespace RefactorThis.GraphDiff.Internal
             {
                 // we are always working with 2 graphs, simply add a 'persisted' one if none exists,
                 // this ensures that only the changes we make within the bounds of the mapping are attempted.
-                persisted = new T();
+                var instance = CreateInstance();
+
+                persisted = instance;
                 context.Set<T>().Add(persisted);
             }
 
             return persisted;
+        }
+
+        private static T CreateInstance()
+        {
+            // This allows for a protected or internal parameterless constructor
+            const BindingFlags flags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance;
+            var ctor = typeof (T).GetConstructor(flags, null, new Type[0], null);
+            var instance = ctor.Invoke(null);
+            return (T) instance;
         }
 
         private T FindEntityMatching(DbContext context, T entity)

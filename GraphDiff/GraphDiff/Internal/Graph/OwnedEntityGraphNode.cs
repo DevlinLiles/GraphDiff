@@ -40,7 +40,7 @@ namespace RefactorThis.GraphDiff.Internal.Graph
                 childMember.Update(context, dbValue, newValue);
         }
 
-        private object CreateNewPersistedEntity<T>(DbContext context, T existing, object newValue) where T : class, new()
+        private object CreateNewPersistedEntity<T>(DbContext context, T existing, object newValue) where T : class
         {
             var instance = Activator.CreateInstance(newValue.GetType());
             SetValue(existing, instance);
